@@ -6,11 +6,12 @@
 #include <QPainter>
 
 class World;
+class PlayerController;
 
-class Player
+class Player : public QObject
 {
 	public:
-		Player(World &world, const QColor &color);
+		Player(World &world, PlayerController *controller);
 
 		void place();
 
@@ -27,10 +28,11 @@ class Player
 	private:
 		QPoint getPendingPoint() const;
 
+		PlayerController *m_controller;
+
 		World &m_world;
 
 		QPolygon m_path;
-		QColor m_color;
 
 		float m_elapsed;
 

@@ -2,16 +2,12 @@
 
 #include "Player.h"
 #include "World.h"
+#include "Utility.h"
+#include "PlayerController.h"
 
-template<typename T>
-T lerp(T start, T end, float value)
-{
-	return start + (end - start) * value;
-}
-
-Player::Player(World &world, const QColor &color)
-	: m_world(world)
-	, m_color(color)
+Player::Player(World &world, PlayerController *controller)
+	: m_controller(controller)
+	, m_world(world)
 	, m_elapsed(0)
 	, m_direction(1)
 	, m_score(0)
@@ -29,7 +25,7 @@ void Player::place()
 
 	const QPoint &position = getPendingPoint();
 
-	const int score = m_world.tryClaimIsland(position, m_color);
+	const int score = m_world.tryClaimIsland(position, m_controller->color());
 
 	if (score > 0)
 	{
@@ -38,7 +34,7 @@ void Player::place()
 		m_path << position;
 
 		m_elapsed = 0;
-		m_direction = (qrand() % 2) ? -1 : 1;
+		m_direction = -m_direction;
 
 		const int islandCount = (qrand() % 2) + 1;
 
@@ -67,7 +63,7 @@ void Player::update(long delta)
 
 void Player::draw(QPainter &painter)
 {
-	painter.setPen(QPen(m_color, 5));
+	painter.setPen(QPen(m_controller->color(), 5));
 	painter.drawPolyline(m_path);
 
 	const QPoint &point = getPendingPoint();

@@ -4,10 +4,12 @@
 #include <cmath>
 
 #include "World.h"
+#include "Island.h"
+#include "IPlayerController.h"
 
-World::World()
+World::World(IPlayerController &playerController)
+	: m_playerController(playerController)
 {
-
 }
 
 float World::createIsland(const QPoint &origin, float offset)
@@ -50,7 +52,9 @@ void World::reset()
 	m_islands.clear();
 	m_unclaimedIslands.clear();
 
-	for (int i = 0; i < 3; i++)
+	const QVector<Player *> &players = m_playerController.players();
+
+	for (int i = 0; i < players.count(); i++)
 	{
 		createIsland(QPoint(), i);
 	}

@@ -6,6 +6,8 @@
 
 #include "Player.h"
 #include "World.h"
+#include "Stage.h"
+#include "IPlayerController.h"
 
 class Window : public QRasterWindow
 {
@@ -17,9 +19,8 @@ class Window : public QRasterWindow
 		void keyPressEvent(QKeyEvent *event) override;
 
 		QElapsedTimer m_timer;
-		QVector<Player *> m_players;
 
-		World m_world;
+		Stage m_stage;
 };
 
 #endif // WINDOW_H
