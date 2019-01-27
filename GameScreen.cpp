@@ -1,5 +1,7 @@
 #include "GameScreen.h"
 #include "Player.h"
+#include "PlayerController.h"
+#include "IInputMethod.h"
 
 GameScreen::GameScreen(Stage *stage, QVector<PlayerController *> players)
 	: m_world(*this)
@@ -16,7 +18,7 @@ GameScreen::GameScreen(Stage *stage, QVector<PlayerController *> players)
 
 	for (PlayerController *player : players)
 	{
-		m_players << new Player(m_world, player);
+		m_players << new Player(m_world, *this, player);
 	}
 
 	m_world.reset();
@@ -47,17 +49,20 @@ void GameScreen::draw(QPainter &painter)
 
 	for (Player *player : m_players)
 	{
+		const QRect scoreRect(-viewportWidth / 2, -vp.height() / 2, viewportWidth, 60 + player->rank() * 20);
+		const QRect viewport(-viewportWidth / 2, -(vp.height() / 2 - scoreRect.height()), viewportWidth, vp.height() - scoreRect.height());
+
+		static const QFont scoreFont("Bebas Neue", 30);
+
 		painter.resetTransform();
-
-		const QRect viewport(viewportWidth * i, 0, viewportWidth, vp.height());
-
-		static const QFont scoreFont("sans", 40, 70);
-
-		painter.setClipRect(viewport);
+		painter.setClipRect(vp);
 		painter.translate(viewportWidth * i + (viewportWidth / 2), vp.height() / 2);
 		painter.setPen(QPen(Qt::white, 2));
 		painter.setFont(scoreFont);
-		painter.drawText(QRect(10, 10 - vp.height() / 2, 100, 60), QString::number(player->score()));
+		painter.fillRect(scoreRect, player->controller()->color());
+		painter.drawText(scoreRect, Qt::AlignCenter, QString::number(player->score()));
+		painter.setClipRect(viewport);
+		painter.fillRect(viewport, player->controller()->color().dark(500));
 		painter.translate(-player->position());
 
 		m_world.draw(painter);
@@ -78,19 +83,12 @@ void GameScreen::draw(QPainter &painter)
 
 void GameScreen::keyPressed(QKeyEvent *event)
 {
-//	if (event->key() == Qt::Key_Control)
-//	{
-//		m_players[0]->place();
-//	}
-
-	if (event->key() == Qt::Key_Space)
+	for (Player *player : m_players)
 	{
-		m_players[0]->place();
-	}
-
-	if (event->key() == Qt::Key_Enter)
-	{
-		m_players[1]->place();
+		if (player->controller()->inputMethod()->isInput(event))
+		{
+			return player->place();
+		}
 	}
 
 	if (event->key() == Qt::Key_Return)

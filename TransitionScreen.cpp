@@ -39,6 +39,7 @@ void TransitionScreen::draw(QPainter &painter)
 	const QRect &viewport = painter.viewport();
 
 	painter.resetTransform();
+	painter.setClipRect(viewport);
 	painter.setOpacity(alpha);
 	painter.fillRect(viewport, Qt::black);
 	painter.setOpacity(1.0f);

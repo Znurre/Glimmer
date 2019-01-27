@@ -17,7 +17,6 @@ HEADERS += \
     Window.h \
     Player.h \
     World.h \
-    IPlayerController.h \
     Island.h \
     PlayerSelectionScreen.h \
     IScreen.h \
@@ -27,4 +26,5 @@ HEADERS += \
     TransitionScreen.h \
     IInputMethod.h \
     KeyboardInputMethod.h \
-    PlayerController.h
+    PlayerController.h \
+    IPlayerProvider.h

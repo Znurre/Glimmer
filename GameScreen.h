@@ -2,13 +2,13 @@
 #define GAMESCREEN_H
 
 #include "IScreen.h"
-#include "IPlayerController.h"
+#include "IPlayerProvider.h"
 #include "World.h"
 
 class Stage;
 class PlayerController;
 
-class GameScreen : public IScreen, public IPlayerController
+class GameScreen : public IScreen, public IPlayerProvider
 {
 	public:
 		GameScreen(Stage *stage, QVector<PlayerController *> players);

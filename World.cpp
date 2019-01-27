@@ -5,9 +5,9 @@
 
 #include "World.h"
 #include "Island.h"
-#include "IPlayerController.h"
+#include "IPlayerProvider.h"
 
-World::World(IPlayerController &playerController)
+World::World(IPlayerProvider &playerController)
 	: m_playerController(playerController)
 {
 }

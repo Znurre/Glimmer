@@ -7,7 +7,7 @@
 #include "Player.h"
 #include "World.h"
 #include "Stage.h"
-#include "IPlayerController.h"
+#include "IPlayerProvider.h"
 
 class Window : public QRasterWindow
 {

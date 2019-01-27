@@ -68,7 +68,7 @@ void Island::draw(QPainter &painter, bool unclaimed)
 	if (m_ripple > 0)
 	{
 		painter.setOpacity(1.0f - (m_ripple / 10.0f));
-		painter.setPen(QPen(m_color.light(400), 2));
+		painter.setPen(QPen(Qt::white, 2));
 		painter.drawEllipse(m_position, (int)(m_size + m_ripple), (int)(m_size + m_ripple));
 		painter.setOpacity(1.0f);
 	}

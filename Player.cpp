@@ -4,16 +4,26 @@
 #include "World.h"
 #include "Utility.h"
 #include "PlayerController.h"
+#include "IPlayerProvider.h"
 
-Player::Player(World &world, PlayerController *controller)
+Player::Player(World &world, IPlayerProvider &playerProvider, PlayerController *controller)
 	: m_controller(controller)
 	, m_world(world)
+	, m_playerProvider(playerProvider)
 	, m_elapsed(0)
+	, m_rankTimer(0)
 	, m_direction(1)
 	, m_score(0)
+	, m_rank(0)
+	, m_previousRank(0)
 	, m_dead(false)
 {
 	m_path << QPoint();
+}
+
+PlayerController *Player::controller() const
+{
+	return m_controller;
 }
 
 void Player::place()
@@ -53,6 +63,26 @@ void Player::place()
 
 void Player::update(long delta)
 {
+	int rank = 0;
+
+	for (Player *player : m_playerProvider.players())
+	{
+		if (m_score > player->score())
+		{
+			rank++;
+		}
+	}
+
+	if (rank != m_rank)
+	{
+		m_rankTimer = 0;
+
+		m_previousRank = m_rank;
+		m_rank = rank;
+	}
+
+	m_rankTimer += delta / 500.0f;
+
 	if (m_dead)
 	{
 		return;
@@ -77,6 +107,8 @@ void Player::reset()
 	m_dead = false;
 	m_elapsed = 0;
 	m_direction = 1;
+	m_rank = 0;
+	m_previousRank = 0;
 
 	m_path.clear();
 	m_path << QPoint();
@@ -102,6 +134,11 @@ int Player::score() const
 bool Player::isDead() const
 {
 	return m_dead;
+}
+
+float Player::rank() const
+{
+	return lerp((float)m_previousRank, (float)m_rank, qMin(1.0f, m_rankTimer));
 }
 
 QPoint Player::getPendingPoint() const

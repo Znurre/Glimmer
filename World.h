@@ -9,12 +9,12 @@
 #include <QSet>
 
 class Island;
-class IPlayerController;
+class IPlayerProvider;
 
 class World
 {
 	public:
-		World(IPlayerController &playerController);
+		World(IPlayerProvider &playerController);
 
 		float createIsland(const QPoint &origin, float offset);
 
@@ -25,7 +25,7 @@ class World
 		int tryClaimIsland(const QPoint &point, const QColor &color);
 
 	private:
-		IPlayerController &m_playerController;
+		IPlayerProvider &m_playerController;
 
 		QSet<Island *> m_unclaimedIslands;
 		QVector<Island *> m_islands;
