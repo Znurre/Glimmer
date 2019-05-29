@@ -12,9 +12,9 @@ class IPlayerProvider;
 class Player : public QObject
 {
 	public:
-		Player(World &world, IPlayerProvider &playerProvider, PlayerController *controller);
+		Player(World &world, IPlayerProvider &playerProvider, PlayerController &controller);
 
-		PlayerController *controller() const;
+		PlayerController &controller() const;
 
 		void place();
 
@@ -33,7 +33,7 @@ class Player : public QObject
 	private:
 		QPoint getPendingPoint() const;
 
-		PlayerController *m_controller;
+		PlayerController &m_controller;
 
 		World &m_world;
 		IPlayerProvider &m_playerProvider;

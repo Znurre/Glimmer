@@ -1,6 +1,8 @@
 QT += gamepad
 
 SOURCES += \
+    GameFieldScreen.cpp \
+    ViewportBoundsCalculator.cpp \
     main.cpp \
     Window.cpp \
     Player.cpp \
@@ -14,6 +16,8 @@ SOURCES += \
     PlayerController.cpp
 
 HEADERS += \
+    GameFieldScreen.h \
+    ViewportBoundsCalculator.h \
     Window.h \
     Player.h \
     World.h \

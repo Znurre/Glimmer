@@ -6,7 +6,7 @@
 #include "PlayerController.h"
 #include "IPlayerProvider.h"
 
-Player::Player(World &world, IPlayerProvider &playerProvider, PlayerController *controller)
+Player::Player(World &world, IPlayerProvider &playerProvider, PlayerController &controller)
 	: m_controller(controller)
 	, m_world(world)
 	, m_playerProvider(playerProvider)
@@ -21,7 +21,7 @@ Player::Player(World &world, IPlayerProvider &playerProvider, PlayerController *
 	m_path << QPoint();
 }
 
-PlayerController *Player::controller() const
+PlayerController &Player::controller() const
 {
 	return m_controller;
 }
@@ -35,7 +35,7 @@ void Player::place()
 
 	const QPoint &position = getPendingPoint();
 
-	const int score = m_world.tryClaimIsland(position, m_controller->color());
+	const int score = m_world.tryClaimIsland(position, m_controller.color());
 
 	if (score > 0)
 	{
@@ -93,10 +93,18 @@ void Player::update(long delta)
 
 void Player::draw(QPainter &painter)
 {
-	painter.setPen(QPen(m_controller->color(), 5));
+	painter.setPen(QPen(m_controller.color(), 5));
+	painter.setBrush(m_controller.color());
+	painter.drawEllipse(m_path.first(), 5, 5);
+	painter.setBrush(Qt::NoBrush);
 	painter.drawPolyline(m_path);
 
 	const QPoint &point = getPendingPoint();
+
+	if (m_dead)
+	{
+		painter.drawEllipse(point, 5, 5);
+	}
 
 	painter.drawLine(m_path.last(), point);
 }

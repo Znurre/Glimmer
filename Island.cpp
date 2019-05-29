@@ -56,7 +56,10 @@ void Island::draw(QPainter &painter, bool unclaimed)
 
 		painter.setFont(font);
 		painter.setPen(QPen(QColor("#1cdc9a"), 2));
+//		painter.setPen(QPen(Qt::white, 2));
+//		painter.setBrush(QColor(255, 255, 255, 20));
 		painter.drawEllipse(m_position, m_size, m_size);
+//		painter.setBrush(Qt::NoBrush);
 		painter.drawText(rect, Qt::AlignCenter, QString::number(score()));
 	}
 	else

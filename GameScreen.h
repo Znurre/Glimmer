@@ -7,11 +7,15 @@
 
 class Stage;
 class PlayerController;
+class GameFieldScreen;
 
-class GameScreen : public IScreen, public IPlayerProvider
+class GameScreen
+	: public IScreen
+	, public IPlayerProvider
 {
 	public:
 		GameScreen(Stage *stage, QVector<PlayerController *> players);
+		~GameScreen() override;
 
 		QVector<Player *> players() const override;
 
@@ -26,8 +30,15 @@ class GameScreen : public IScreen, public IPlayerProvider
 
 	private:
 		QVector<Player *> m_players;
+		QVector<PlayerController *> m_controllers;
+		QVector<GameFieldScreen *> m_screens;
 
+		QSet<Player *> m_playersForRematch;
+
+		Stage *m_stage;
 		World m_world;
+
+		long m_deadTimer;
 };
 
 #endif // GAMESCREEN_H
