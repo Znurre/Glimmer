@@ -7,7 +7,9 @@
 #include "IInputMethod.h"
 #include "Stage.h"
 #include "PlayerSelectionScreen.h"
-#include "GameFieldScreen.h"
+#include "IPlayerInputCallback.h"
+#include "PlayerRematchCallback.h"
+#include "PlayerPlacementCallback.h"
 
 GameScreen::GameScreen(Stage *stage, QVector<PlayerController *> players)
 	: m_controllers(players)
@@ -17,10 +19,6 @@ GameScreen::GameScreen(Stage *stage, QVector<PlayerController *> players)
 {
 	for (PlayerController *player : players)
 	{
-//		ViewportBoundsCalculator viewportBoundsCalculator;
-
-//		m_screens << new GameFieldScreen(player, viewportBoundsCalculator, m_world, *this);
-
 		m_players << new Player(m_world, *this, *player);
 	}
 
@@ -40,17 +38,19 @@ QVector<Player *> GameScreen::players() const
 void GameScreen::update(long delta)
 {
 	bool allPlayersDead = true;
+	bool allPlayersRematch = true;
 
 	for (Player *player : m_players)
 	{
 		player->update(delta);
 
 		allPlayersDead &= player->isDead();
+		allPlayersRematch &= player->rematchRequested();
 	}
 
 	if (allPlayersDead)
 	{
-		if ((m_deadTimer += delta) > 10000 && m_playersForRematch.count() < m_players.count())
+		if ((m_deadTimer += delta) > 10000 && !allPlayersRematch)
 		{
 			return m_stage->changeScreen(new PlayerSelectionScreen(m_stage), 500.0f);
 		}
@@ -108,7 +108,7 @@ void GameScreen::draw(QPainter &painter)
 			painter.setPen(Qt::white);
 			painter.drawText(viewport.translated(0, -30), Qt::AlignCenter, "You are dead");
 
-			if (m_deadTimer > 0 && !m_playersForRematch.contains(player))
+			if (m_deadTimer > 0 && !player->rematchRequested())
 			{
 				const QRect deathRect(viewport.x() + (viewportWidth - 250) / 2, viewport.y() + (viewport.height() - 250) / 2, 250, 250);
 
@@ -131,23 +131,25 @@ void GameScreen::draw(QPainter &painter)
 void GameScreen::keyPressed(QKeyEvent *event)
 {
 	bool allPlayersDead = true;
+	bool allPlayersRematch = true;
 
 	for (Player *player : m_players)
 	{
-		allPlayersDead &= player->isDead();
-
 		if (player->controller().inputMethod()->isInput(event))
 		{
-			if (!player->isDead())
-			{
-				return player->place();
-			}
+			const auto callback = resolveInputCallback(player);
 
-			m_playersForRematch << player;
+			if (callback)
+			{
+				callback->invoke(player);
+			}
 		}
+
+		allPlayersDead &= player->isDead();
+		allPlayersRematch &= player->rematchRequested();
 	}
 
-	if (m_playersForRematch.count() == m_players.count())
+	if (allPlayersRematch)
 	{
 		m_stage->changeScreen(new GameScreen(m_stage, m_controllers), 500.0f);
 	}
@@ -155,17 +157,35 @@ void GameScreen::keyPressed(QKeyEvent *event)
 
 void GameScreen::keyReleased(QKeyEvent *event)
 {
-	Q_UNUSED(event);
+	Q_UNUSED(event)
 }
 
 void GameScreen::gamepadButtonPressed(int deviceId, QGamepadManager::GamepadButton button)
 {
-	Q_UNUSED(deviceId);
-	Q_UNUSED(button);
+	Q_UNUSED(deviceId)
+	Q_UNUSED(button)
 }
 
 void GameScreen::gamepadButtonReleased(int deviceId, QGamepadManager::GamepadButton button)
 {
-	Q_UNUSED(deviceId);
-	Q_UNUSED(button);
+	Q_UNUSED(deviceId)
+	Q_UNUSED(button)
+}
+
+IPlayerInputCallback *GameScreen::resolveInputCallback(Player *player) const
+{
+	static PlayerRematchCallback rematchCallback;
+	static PlayerPlacementCallback placementCallback;
+
+	if (!player->isDead())
+	{
+		return &placementCallback;
+	}
+
+	if (m_deadTimer > 0)
+	{
+		return &rematchCallback;
+	}
+
+	return nullptr;
 }

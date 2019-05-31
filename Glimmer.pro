@@ -1,8 +1,8 @@
 QT += gamepad
 
 SOURCES += \
-    GameFieldScreen.cpp \
-    ViewportBoundsCalculator.cpp \
+    PlayerPlacementCallback.cpp \
+    PlayerRematchCallback.cpp \
     main.cpp \
     Window.cpp \
     Player.cpp \
@@ -16,8 +16,9 @@ SOURCES += \
     PlayerController.cpp
 
 HEADERS += \
-    GameFieldScreen.h \
-    ViewportBoundsCalculator.h \
+    IPlayerInputCallback.h \
+    PlayerPlacementCallback.h \
+    PlayerRematchCallback.h \
     Window.h \
     Player.h \
     World.h \

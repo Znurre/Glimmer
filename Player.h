@@ -12,21 +12,25 @@ class IPlayerProvider;
 class Player : public QObject
 {
 	public:
-		Player(World &world, IPlayerProvider &playerProvider, PlayerController &controller);
+		Player(World &world
+			, IPlayerProvider &playerProvider
+			, PlayerController &controller
+			);
 
 		PlayerController &controller() const;
 
 		void place();
+		void rematch();
 
 		void update(long delta);
 		void draw(QPainter &painter);
-		void reset();
 
 		QPoint position() const;
 
 		int score() const;
 
 		bool isDead() const;
+		bool rematchRequested() const;
 
 		float rank() const;
 
@@ -49,6 +53,7 @@ class Player : public QObject
 		int m_previousRank;
 
 		bool m_dead;
+		bool m_rematch;
 };
 
 #endif // PLAYER_H

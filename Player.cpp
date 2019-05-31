@@ -6,7 +6,10 @@
 #include "PlayerController.h"
 #include "IPlayerProvider.h"
 
-Player::Player(World &world, IPlayerProvider &playerProvider, PlayerController &controller)
+Player::Player(World &world
+	, IPlayerProvider &playerProvider
+	, PlayerController &controller
+	)
 	: m_controller(controller)
 	, m_world(world)
 	, m_playerProvider(playerProvider)
@@ -17,6 +20,7 @@ Player::Player(World &world, IPlayerProvider &playerProvider, PlayerController &
 	, m_rank(0)
 	, m_previousRank(0)
 	, m_dead(false)
+	, m_rematch(false)
 {
 	m_path << QPoint();
 }
@@ -59,6 +63,11 @@ void Player::place()
 	{
 		m_dead = true;
 	}
+}
+
+void Player::rematch()
+{
+	m_rematch = true;
 }
 
 void Player::update(long delta)
@@ -109,19 +118,6 @@ void Player::draw(QPainter &painter)
 	painter.drawLine(m_path.last(), point);
 }
 
-void Player::reset()
-{
-	m_score = 0;
-	m_dead = false;
-	m_elapsed = 0;
-	m_direction = 1;
-	m_rank = 0;
-	m_previousRank = 0;
-
-	m_path.clear();
-	m_path << QPoint();
-}
-
 QPoint Player::position() const
 {
 	const int count = m_path.count();
@@ -142,6 +138,11 @@ int Player::score() const
 bool Player::isDead() const
 {
 	return m_dead;
+}
+
+bool Player::rematchRequested() const
+{
+	return m_rematch;
 }
 
 float Player::rank() const

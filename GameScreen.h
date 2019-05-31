@@ -8,6 +8,7 @@
 class Stage;
 class PlayerController;
 class GameFieldScreen;
+class IPlayerInputCallback;
 
 class GameScreen
 	: public IScreen
@@ -29,11 +30,11 @@ class GameScreen
 		void gamepadButtonReleased(int deviceId, QGamepadManager::GamepadButton button) override;
 
 	private:
+		IPlayerInputCallback *resolveInputCallback(Player *player) const;
+
 		QVector<Player *> m_players;
 		QVector<PlayerController *> m_controllers;
 		QVector<GameFieldScreen *> m_screens;
-
-		QSet<Player *> m_playersForRematch;
 
 		Stage *m_stage;
 		World m_world;
