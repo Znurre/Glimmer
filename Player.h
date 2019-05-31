@@ -62,6 +62,7 @@ class Player : public QObject
 		int m_count;
 		int m_spawnIslands;
 		int m_slowDown;
+		int m_timeModifier;
 
 		bool m_dead;
 		bool m_rematch;

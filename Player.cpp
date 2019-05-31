@@ -26,6 +26,7 @@ Player::Player(World &world
 	, m_count(0)
 	, m_spawnIslands(0)
 	, m_slowDown(0)
+	, m_timeModifier(1)
 	, m_dead(false)
 	, m_rematch(false)
 {
@@ -58,8 +59,9 @@ void Player::place()
 		m_path << position;
 
 		m_elapsed = 0;
-		m_direction = -m_direction;
+		m_direction = (-m_direction) * m_timeModifier;
 		m_slowDown--;
+		m_timeModifier = 1;
 
 		const int islandCount = (qrand() % 2) + 1;
 
@@ -90,7 +92,7 @@ void Player::addScore(int score)
 
 void Player::reverse()
 {
-	m_direction = m_direction > 0 ? -1 : 1;
+	m_timeModifier = m_timeModifier > 0 ? -1 : 1;
 }
 
 void Player::spawnIslands()
@@ -130,7 +132,7 @@ void Player::update(long delta)
 		return;
 	}
 
-	m_elapsed += delta / 500.0f;
+	m_elapsed += (delta / 500.0f) * m_timeModifier;
 
 	if (getAngle() > 2)
 	{
@@ -195,7 +197,7 @@ float Player::rank() const
 
 float Player::getAngle() const
 {
-	return m_elapsed * (0.5 + (m_count / 100.0f)) * (m_slowDown > 0 ? 0.5 : 1);
+	return m_elapsed * (0.5 + (m_count / 100.0f)) * (m_slowDown > 0 ? 1.4 : 1);
 }
 
 QPoint Player::getPendingPoint() const
