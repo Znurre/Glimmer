@@ -19,8 +19,9 @@ float World::createIsland(const QPoint &origin, float offset)
 	const int size = (qrand() % 20) + 10;
 	const int x = origin.x() + sin(direction * M_PI) * 50;
 	const int y = origin.y() - abs(cos(direction * M_PI) * 50);
+	const int item = qMax(-1, qrand() % 14 - 10);
 
-	Island *island = new Island(QPoint(x, y), size);
+	Island *island = new Island(QPoint(x, y), size, item);
 
 	m_islands << island;
 	m_unclaimedIslands << island;
@@ -60,7 +61,15 @@ void World::reset()
 	}
 }
 
-int World::tryClaimIsland(const QPoint &point, const QColor &color)
+void World::lowerScores()
+{
+	for (Island *island : m_islands)
+	{
+		island->lowerScore();
+	}
+}
+
+IIslandClaimCallback *World::tryClaimIsland(const QPoint &point, const QColor &color, bool spawnIslands)
 {
 	QMap<float, Island *> islandsByDistance;
 
@@ -83,5 +92,15 @@ int World::tryClaimIsland(const QPoint &point, const QColor &color)
 		return island->claim(color);
 	}
 
-	return -1;
+	if (spawnIslands)
+	{
+		Island *island = new Island(point, 20, -1);
+
+		m_islands << island;
+		m_unclaimedIslands << island;
+
+		return tryClaimIsland(point, color, false);
+	}
+
+	return nullptr;
 }

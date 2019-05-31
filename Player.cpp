@@ -1,10 +1,13 @@
 #include <cmath>
 
+#include <QDebug>
+
 #include "Player.h"
 #include "World.h"
 #include "Utility.h"
 #include "PlayerController.h"
 #include "IPlayerProvider.h"
+#include "IIslandClaimCallback.h"
 
 Player::Player(World &world
 	, IPlayerProvider &playerProvider
@@ -19,6 +22,10 @@ Player::Player(World &world
 	, m_score(0)
 	, m_rank(0)
 	, m_previousRank(0)
+	, m_combo(0)
+	, m_count(0)
+	, m_spawnIslands(0)
+	, m_slowDown(0)
 	, m_dead(false)
 	, m_rematch(false)
 {
@@ -39,16 +46,20 @@ void Player::place()
 
 	const QPoint &position = getPendingPoint();
 
-	const int score = m_world.tryClaimIsland(position, m_controller.color());
+	const auto callback = m_world.tryClaimIsland(position, m_controller.color(), m_spawnIslands-- > 0);
 
-	if (score > 0)
+	if (callback)
 	{
-		m_score += score;
+		callback->invoke(this, m_playerProvider, m_world);
+
+		m_combo++;
+		m_count++;
 
 		m_path << position;
 
 		m_elapsed = 0;
 		m_direction = -m_direction;
+		m_slowDown--;
 
 		const int islandCount = (qrand() % 2) + 1;
 
@@ -58,6 +69,8 @@ void Player::place()
 		{
 			offset += m_world.createIsland(position, offset);
 		}
+
+		delete callback;
 	}
 	else
 	{
@@ -68,6 +81,26 @@ void Player::place()
 void Player::rematch()
 {
 	m_rematch = true;
+}
+
+void Player::addScore(int score)
+{
+	m_score += score;
+}
+
+void Player::reverse()
+{
+	m_direction = m_direction > 0 ? -1 : 1;
+}
+
+void Player::spawnIslands()
+{
+	m_spawnIslands = 3;
+}
+
+void Player::slowDown()
+{
+	m_slowDown = 3;
 }
 
 void Player::update(long delta)
@@ -98,6 +131,11 @@ void Player::update(long delta)
 	}
 
 	m_elapsed += delta / 500.0f;
+
+	if (getAngle() > 2)
+	{
+		m_combo = 0;
+	}
 }
 
 void Player::draw(QPainter &painter)
@@ -110,7 +148,7 @@ void Player::draw(QPainter &painter)
 
 	const QPoint &point = getPendingPoint();
 
-	if (m_dead)
+	if (m_dead || m_spawnIslands > 0)
 	{
 		painter.drawEllipse(point, 5, 5);
 	}
@@ -135,6 +173,11 @@ int Player::score() const
 	return m_score;
 }
 
+int Player::combo() const
+{
+	return m_combo / 15;
+}
+
 bool Player::isDead() const
 {
 	return m_dead;
@@ -150,11 +193,16 @@ float Player::rank() const
 	return lerp((float)m_previousRank, (float)m_rank, qMin(1.0f, m_rankTimer));
 }
 
+float Player::getAngle() const
+{
+	return m_elapsed * (0.5 + (m_count / 100.0f)) * (m_slowDown > 0 ? 0.5 : 1);
+}
+
 QPoint Player::getPendingPoint() const
 {
 	const QPoint &position = m_path.last();
 
-	const float direction = (m_elapsed * (0.5 + (m_score / 100.0f))) * m_direction;
+	const float direction = getAngle() * m_direction;
 
 	const int x = position.x() + sin(direction * M_PI) * 50;
 	const int y = position.y() + cos(direction * M_PI) * 50;

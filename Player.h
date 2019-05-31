@@ -21,6 +21,10 @@ class Player : public QObject
 
 		void place();
 		void rematch();
+		void addScore(int score);
+		void reverse();
+		void spawnIslands();
+		void slowDown();
 
 		void update(long delta);
 		void draw(QPainter &painter);
@@ -28,6 +32,7 @@ class Player : public QObject
 		QPoint position() const;
 
 		int score() const;
+		int combo() const;
 
 		bool isDead() const;
 		bool rematchRequested() const;
@@ -35,6 +40,8 @@ class Player : public QObject
 		float rank() const;
 
 	private:
+		float getAngle() const;
+
 		QPoint getPendingPoint() const;
 
 		PlayerController &m_controller;
@@ -51,6 +58,10 @@ class Player : public QObject
 		int m_score;
 		int m_rank;
 		int m_previousRank;
+		int m_combo;
+		int m_count;
+		int m_spawnIslands;
+		int m_slowDown;
 
 		bool m_dead;
 		bool m_rematch;

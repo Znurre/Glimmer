@@ -82,7 +82,7 @@ void GameScreen::draw(QPainter &painter)
 		painter.fillRect(scoreRect, player->controller().color());
 		painter.drawText(scoreRect, Qt::AlignCenter, QString::number(player->score()));
 		painter.setClipRect(viewport);
-		painter.fillRect(viewport, player->controller().color().dark(500));
+		painter.fillRect(viewport, player->controller().color().dark(500).light(100 + player->combo() * 25));
 		painter.translate(-player->position());
 
 		m_world.draw(painter);

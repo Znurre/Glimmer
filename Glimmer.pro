@@ -1,8 +1,13 @@
 QT += gamepad
 
 SOURCES += \
+    IslandScoreCallback.cpp \
+    LowerScoreClaimCallback.cpp \
     PlayerPlacementCallback.cpp \
     PlayerRematchCallback.cpp \
+    ReverseDirectionClaimCallback.cpp \
+    SlowTimeClaimCallback.cpp \
+    SpawnIslandsClaimCallback.cpp \
     main.cpp \
     Window.cpp \
     Player.cpp \
@@ -16,9 +21,15 @@ SOURCES += \
     PlayerController.cpp
 
 HEADERS += \
+    IIslandClaimCallback.h \
     IPlayerInputCallback.h \
+    IslandScoreCallback.h \
+    LowerScoreClaimCallback.h \
     PlayerPlacementCallback.h \
     PlayerRematchCallback.h \
+    ReverseDirectionClaimCallback.h \
+    SlowTimeClaimCallback.h \
+    SpawnIslandsClaimCallback.h \
     Window.h \
     Player.h \
     World.h \

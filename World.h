@@ -10,6 +10,7 @@
 
 class Island;
 class IPlayerProvider;
+class IIslandClaimCallback;
 
 class World
 {
@@ -21,8 +22,9 @@ class World
 		void update(long delta);
 		void draw(QPainter &painter);
 		void reset();
+		void lowerScores();
 
-		int tryClaimIsland(const QPoint &point, const QColor &color);
+		IIslandClaimCallback *tryClaimIsland(const QPoint &point, const QColor &color, bool spawnIslands);
 
 	private:
 		IPlayerProvider &m_playerController;
